@@ -1,0 +1,159 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="#" class="breadcrumb">Lista zakupów</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Lista zakupów
+
+{% endblock %}
+
+{% block header_title %}
+
+Lista zakupów
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <br><br>
+    <div class="container">
+        <div class="card">
+            <div class="card-content">
+                <form method="POST" action="/zrob_zakupy" id="shopping_list">{% csrf_token %}
+                    <table class="responsive-table striped centered">
+                        <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Kategoria</th>
+                            <th>Konto</th>
+                            <th>Ilość</th>
+                            <th></th>
+                            <th>Cena za jedn.</th>
+                            <th></th>
+                            <th>Kupione</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for element in shopping_list %}
+                                <tr>
+                                    <td>{{ element.name }}</td>
+                                    <td>{{ element.category }}</td>
+                                    <td>{{ element.planned_account }}</td>
+                                    <td class="input-field col s2"><input type="text" value="{{ element.quantity }}" name="{{element.id}}_quantity" class="center"></td>
+                                    <td>{{ element.unit_name }}</td>
+                                    <td class="input-field"><input type="text" name="{{ element.id }}_prize" class="center"></td>
+                                    <td>zł/{{ element.unit_name }}</td>
+                                    <td class="center"><label><input type="checkbox" name="{{ element.id }}_bought" class="filled-in"/><span></span></label></td>
+                                    <td>
+                                        <div id="delete_{{element.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usunąć {{element.name}} ({{ element.quantity }})?</p>
+                                            <p>
+                                                 <a href="usun_element?id={{ element.id }}" class="btn-floating waves-effect waves-light red modal-trigger">
+                                                    <i class="material-icons">clear</i>
+                                                </a>
+                                            </p>
+                                        </div>
+                                        </div>
+                                        <a href="#delete_{{element.id }}"
+                                           class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                           data-position="right"
+                                           data-tooltip="Usuń element">
+                                                <i class="material-icons">clear</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <form method="post" action="/dodaj_zakup">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large blue">
+    <i class="large material-icons">mode_edit</i>
+  </a>
+  <ul>
+    <li>
+        <a href="#modal1"
+               class="btn-floating btn waves-effect waves-light red modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Dodaj nową pozycję">
+            <i class="material-icons">add</i>
+        </a>
+    </li>
+    <li>
+        <a href="#"
+           id="finish_list"
+               class="btn-floating btn waves-effect waves-light amber modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Zrealizuj zakupy">
+            <i class="material-icons">check</i>
+        </a>
+    </li>
+  </ul>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        //var options = ['opacity'=0]
+        var instances = M.Modal.init(elems, {opacity: 0.6,
+                                            endingTop: '6%'});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems);
+     });
+
+    document.getElementById("finish_list").onclick=function() {
+         document.getElementById("shopping_list").submit();
+         return false;
+    };
+
+</script>
+{% endblock %}

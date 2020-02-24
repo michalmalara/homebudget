@@ -1,0 +1,115 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="#" class="breadcrumb">Lista zakupów</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Lista zakupów
+
+{% endblock %}
+
+{% block header_title %}
+
+Lista zakupów
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <br><br>
+    <div class="container">
+        <div class="row">
+            {% for credit in credits %}
+            <div class="card red">
+                <div class="card-content">
+                    <span class="card-title"><h1>{{ credit.name }}</h1></span>
+                    <div class="card orange">
+                        <div class="card-content">
+                            <p>Udzielony kredyt: {{credit.total_debt }} zł</p>
+                            <p>Pozostało do spłaty: {{ credit.debt_left|floatformat:2 }} zł</p>
+                            <p>Wysokość raty: {{ credit.repayment|floatformat:2 }} zł</p>
+                            <p>Oprocentowanie: {{ credit.interests }}%</p>
+                            <p>Obciążane konto: {{credit.account}}</p>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                            <form action="/splata_raty" method="POST" id="splata_form_{{credit.id}}">{% csrf_token %}<input type="hidden" name="id" value="{{credit.id}}"> </form>
+                            <a class="waves-effect waves-light btn-flat" id="splata_{{credit.id}}"><i class="tiny material-icons prefix">account_balance_wallet</i> Spłata raty</a>
+                            <script type="text/javascript">
+                                document.getElementById("splata_{{credit.id}}").onclick=function() {
+                                     document.getElementById("splata_form_{{credit.id}}").submit();
+                                     return false; // cancel the actual link
+                                }
+                            </script>
+                            <a href="#edytuj_modal" class="waves-effect waves-light btn-flat"><i class="tiny material-icons">edit</i> Edytuj</a>
+                            <a href="#czesiowa_splata_modal" class="waves-effect waves-light btn-flat"><i class="tiny material-icons">credit_card</i> Częścoiwa spłata raty</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <form method="post" action="/dodaj_kredyt">
+            {% csrf_token %}
+            {{new_credit_form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="fixed-action-btn">
+    <a href="#modal1"
+       class="btn-floating btn-large waves-effect waves-light red modal-trigger tooltipped"
+       data-position="left"
+       data-tooltip="Dodaj nowy kredyt">
+            <i class="material-icons">add</i>
+    </a>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        //var options = ['opacity'=0]
+        var instances = M.Modal.init(elems, {opacity: 0.6,
+                                            endingTop: '4%'});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems);
+      });
+
+</script>
+{% endblock %}

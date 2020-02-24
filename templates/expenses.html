@@ -1,0 +1,472 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="#" class="breadcrumb">Wydatki</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Wydatki
+
+{% endblock %}
+
+{% block header_title %}
+
+Wydatki
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <form method="get" action="#" id="filter">
+                <div class="col s12 m4">
+                    <label for="id_year">Rok</label>
+                    <select name="year" class="input-field" id="id_year">
+                        <option>2020</option>
+                        <option>2019</option>
+                    </select>
+                </div>
+                <div class="col s12 m4">
+                    <label for="id_month">Miesiąc</label>
+                    <select name="month" class="input-field" id="id_month">
+                        <option {% if picked_month == 1 %} selected {% endif %}>1</option>
+                        <option {% if picked_month == 2 %} selected {% endif %}>2</option>
+                        <option {% if picked_month == 3 %} selected {% endif %}>3</option>
+                        <option {% if picked_month == 4 %} selected {% endif %}>4</option>
+                        <option {% if picked_month == 5 %} selected {% endif %}>5</option>
+                        <option {% if picked_month == 6 %} selected {% endif %}>6</option>
+                        <option {% if picked_month == 7 %} selected {% endif %}>7</option>
+                        <option {% if picked_month == 8 %} selected {% endif %}>8</option>
+                        <option {% if picked_month == 9 %} selected {% endif %}>9</option>
+                        <option {% if picked_month == 10 %} selected {% endif %}>10</option>
+                        <option {% if picked_month == 11 %} selected {% endif %}>11</option>
+                        <option {% if picked_month == 12 %} selected {% endif %}>12</option>
+                    </select>
+                </div>
+        </div>
+            <div class="row">
+            <div class="col s12 m4">
+                <button class="btn waves-effect waves-light" type="submit" name="action">
+                    Filtruj
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <!-- JEDZENIE -->
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Jedzenie: {{ expenses_sum.Jedzenie|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Jedzenie|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Jedzenie|floatformat:2}}%</h6>
+                {% endif %}
+                <p>
+                    <div id="slider-handles4">
+                    </div>
+
+                        <script>
+                            var handlesSlider4 = document.getElementById('slider-handles4');
+
+                            noUiSlider.create(handlesSlider4, {
+                                start: [{{plan.jedzenie}}],
+                                step: 1,
+                                tooltips: [false],
+                                connect: [true, false],
+                                range: {
+                                    'min': [0],
+                                    'max': [100]
+                                },
+                            });
+
+                            var connect = handlesSlider4.querySelectorAll('.noUi-connect');
+                            var classes = ['c-1-color', 'c-2-color'];
+
+                            for (var i = 0; i < connect.length; i++) {
+                                connect[i].classList.add(classes[i]);
+                            }
+
+                            //handlesSlider4.setAttribute('disabled', true);
+
+                        </script>
+                </p>
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Jedzenie %}
+                        <tr>
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.quantity}}</td>
+                            <td>{{expense.unit_price|floatformat:2}} zł/{{expense.unit_name}}</td>
+                            <td>{{expense.total_price|floatformat:2}} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+        <!-- CHEMIA -->
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Chemia: {{ expenses_sum.Chemia|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Chemia|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Chemia|floatformat:2}}%</h6>
+                {% endif %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Chemia %}
+                        <tr>
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.quantity}}</td>
+                            <td>{{expense.unit_price|floatformat:2}} zł/{{expense.unit_name}}</td>
+                            <td>{{expense.total_price|floatformat:2}} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+        <!-- KOSMETYKI, HIGIENA, LEKI -->
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Kosmetyki, środki higieniczne i lekarstwa: {{ expenses_sum.Kosmetyki_Higiena_Leki|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Kosmetyki_Higiena_Leki|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Kosmetyki_Higiena_Leki|floatformat:2}}%</h6>
+                {% endif %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Kosmetyki_Higiena_Leki %}
+                        <tr>
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.quantity}}</td>
+                            <td>{{expense.unit_price|floatformat:2}} zł/{{expense.unit_name}}</td>
+                            <td>{{expense.total_price|floatformat:2}} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+        <!-- DOM -->
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Dom: {{ expenses_sum.Dom|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Dom|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Dom|floatformat:2}}%</h6>
+                {% endif %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Dom %}
+                        <tr>
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.quantity}}</td>
+                            <td>{{expense.unit_price|floatformat:2}} zł/{{expense.unit_name}}</td>
+                            <td>{{expense.total_price|floatformat:2}} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+        <!-- TRANSPORT -->
+        <div class="card">
+            <div class="card-content">
+            <h2 class="header center orange-text">Transport: {{ expenses_sum.Transport|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Transport|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Transport|floatformat:2}}%</h6>
+                {% endif %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Transport %}
+                        <tr>
+                            <td>{{expense.name}}</td>
+                            <td>{{expense.quantity}}</td>
+                            <td>{{expense.unit_price|floatformat:2}} zł/{{expense.unit_name}}</td>
+                            <td>{{expense.total_price|floatformat:2}} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+        <!-- INNE -->
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Inne: {{ expenses_sum.Inne|floatformat:2 }} zł</h2>
+                {% if plan_present %}
+                <h6 class="header center orange-text">Plan na obecny miesiąc: {{plan_evaluation.Inne|floatformat:2}} zł</h6>
+                <h6 class="header center orange-text">Wykorzystano: {{used_plan.Inne|floatformat:2}}%</h6>
+                {% endif %}
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Nazwa produktu</th>
+                            <th>Ilość</th>
+                            <th>Cena/j</th>
+                            <th>Cena</th>
+                            <th>Usuń</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in expenses_list.Inne %}
+                        <tr>
+                            <td>{{ expense.name }}</td>
+                            <td>{{ expense.quantity }}</td>
+                            <td>{{ expense.unit_price|floatformat:2 }} zł/{{ expense.unit_name }}</td>
+                            <td>{{ expense.total_price|floatformat:2 }} zł</td>
+                            <td>
+                                <form method="POST" action="usun_wydatek">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ expense.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wydatek: {{expense.name}}, {{expense.total_price|floatformat:2}} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wydatek">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br /><br />
+    </div>
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <form method="post" action="/add_expense_e">
+            {% csrf_token %}
+            {{form.form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="fixed-action-btn">
+    <a href="#modal1"
+       class="btn-floating btn-large waves-effect waves-light red modal-trigger tooltipped"
+       data-position="left"
+       data-tooltip="Dodaj nowy wydatek">
+            <i class="material-icons">add</i>
+    </a>
+</div>
+
+<br><br>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        //var options = ['opacity'=0]
+        var instances = M.Modal.init(elems, {opacity: 0.6,
+                                            endingTop: '6%'});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems);
+    });
+</script>
+{% endblock %}

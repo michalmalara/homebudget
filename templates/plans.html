@@ -1,0 +1,284 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="#" class="breadcrumb">Plany</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Twoje plany
+
+{% endblock %}
+
+{% block header_title %}
+
+Twoje plany
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <br><br>
+    <div class="container">
+        {% if info %}
+        <div class="card">
+            <div class="card-content center">
+                <span class="red-text">{{info}}</span>
+            </div>
+        </div>
+        {% endif %}
+        <div class="card">
+            <div class="card-content">
+                <table class="striped centered responsive-table">
+                    <thead>
+                        <th>Miesiąc</th>
+                        <th>Przewidywane zarobki</th>
+                        <th><span class="green-text">Jedzenie</span></th>
+                        <th><span class="yellow-text">Chemia</span></th>
+                        <th><span class="blue-text text-light">Kosmetyki,<br>środki higieniczne<br>i lekarstwa</span></th>
+                        <th><span class="red-text text-darken">Dom</span></th>
+                        <th><span class="amber-text">Transport</span></th>
+                        <th><span class="purple-text text-darken-2">Inne</th>
+                        <th><!--Usuń plan--></th>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                        <tr>
+                            <td>{{ plan.plan.date|date:"F Y" }}</td>
+                            <td>{{ plan.plan.predicted_income|floatformat:2 }} zł</td>
+                            <td>{{ plan.jedzenie|floatformat:2 }} zł ({{ plan.plan.jedzenie }}%)</td>
+                            <td>{{ plan.chemia|floatformat:2 }} zł ({{ plan.plan.chemia }}%)</td>
+                            <td>{{ plan.kosmetyki|floatformat:2 }} zł ({{ plan.plan.kosmetyki }}%)</td>
+                            <td>{{ plan.dom|floatformat:2 }} zł ({{ plan.plan.dom }}%)</td>
+                            <td>{{ plan.transport|floatformat:2 }} zł ({{ plan.plan.transport }}%)</td>
+                            <td>{{ plan.inne|floatformat:2 }} zł ({{ plan.plan.inne }}%)</td>
+                            <td>
+                                <form method="POST" action="usun_plan">
+                                {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ plan.plan.id }}">
+                                    <div id="delete_{{ plan.plan.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń plan na {{ plan.plan.date|date:"F Y" }}</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </form>
+                                <a href="#delete_{{plan.plan.id }}"
+                                   class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                   data-position="right"
+                                   data-tooltip="Usuń plan">
+                                        <i class="material-icons">clear</i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+        <div class="modal" id="modal1">
+            <div class="modal-content">
+                <form action="/dodaj_plan" method="POST" id="add_plan">{% csrf_token %}
+                    <div class="row">
+                        <div class="input-field col s2 offset-s2">
+                          <input id="month" name="month" type="number" class="validate center" min="1" max="12" value="{{ current_month }}" required>
+                          <label for="month">Miesiąc</label>
+                        </div>
+                        <div class="input-field col s2">
+                          <input id="year" name="year" type="number" class="validate center" value="{{ current_year }}" required>
+                          <label for="year">Rok</label>
+                        </div>
+                        <div class="input-field col s4">
+                          <input id="incomes" name="incomes" type="number" class="validate center" onchange="salary_updated()" required>
+                          <label for="incomes">Planowane zarobki</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        Plan dystrybujcji zarobków:
+                        <p class="range-field">
+                            <input type="hidden" name="slider" id="slider_value_handler">
+                          <div id="slider-handles4">
+                          </div>
+                        </p>
+                    </div>
+                </form>
+                <table class="centered">
+                    <thead>
+                        <th><span class="green-text">Jedzenie</span></th>
+                        <th><span class="yellow-text">Chemia</span></th>
+                        <th><span class="blue-text text-light">Kosmetyki,<br>środki higieniczne<br>i lekarstwa</span></th>
+                        <th><span class="red-text text-darken">Dom</span></th>
+                        <th><span class="amber-text">Transport</span></th>
+                        <th><span class="purple-text text-darken-2">Inne</th>
+                        <th><span class="teal-text text-lighten-4">Oszczędności</span></th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="jedzenieP">1</td>
+                            <td id="chemiaP">2</td>
+                            <td id="kosmetykiP">3</td>
+                            <td id="domP">4</td>
+                            <td id="transportP">5</td>
+                            <td id="inneP">6</td>
+                            <td id="oszczednosciP">7</td>
+                        </tr>
+                        <tr>
+                            <td id="jedzenie">1</td>
+                            <td id="chemia">2</td>
+                            <td id="kosmetyki">3</td>
+                            <td id="dom">4</td>
+                            <td id="transport">5</td>
+                            <td id="inne">6</td>
+                            <td id="oszczednosci">7</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <a class="btn waves-effect waves-light" onClick="submit_slider()">Dodaj</a>
+                </div>
+                <script>
+                    var handlesSlider4 = document.getElementById('slider-handles4');
+
+                    noUiSlider.create(handlesSlider4, {
+                        start: [15, 28, 45, 60, 71, 85],
+                        step: 1,
+                        tooltips: [false, false, false, false, false, false],
+                        connect: [true, true, true, true, true, true, true],
+                        range: {
+                            'min': [0],
+                            'max': [100]
+                        }
+                    });
+
+                    var connect = handlesSlider4.querySelectorAll('.noUi-connect');
+                    var classes = ['c-1-color', 'c-2-color', 'c-3-color', 'c-4-color', 'c-5-color', 'c-6-color', 'c-7-color'];
+
+                    for (var i = 0; i < connect.length; i++) {
+                        connect[i].classList.add(classes[i]);
+                    }
+
+
+                    handlesSlider4.noUiSlider.on('update', function updated(){
+                        var predicted_income = document.getElementById('incomes').value;
+                        var slider_value = document.getElementById('slider-handles4');
+                        var values = slider_value.noUiSlider.get();
+
+                        //for (var i; i<values.length; i++){
+                        //    values[i] = values[i].toFixed(2)
+                         //   console.log(values[i])
+                        //}
+
+                        document.getElementById('jedzenieP').innerHTML=(values[0]-'0.0').toFixed(0)+'%';
+                        document.getElementById('chemiaP').innerHTML=(values[1]-values[0]).toFixed(0)+'%';
+                        document.getElementById('kosmetykiP').innerHTML=(values[2]-values[1]).toFixed(0)+'%';
+                        document.getElementById('domP').innerHTML=(values[3]-values[2]).toFixed(0)+'%';
+                        document.getElementById('transportP').innerHTML=(values[4]-values[3]).toFixed(0)+'%';
+                        document.getElementById('inneP').innerHTML=(values[5]-values[4]).toFixed(0)+'%';
+                        document.getElementById('oszczednosciP').innerHTML=(100.0-values[5]).toFixed(0)+'%';
+
+                        document.getElementById('jedzenie').innerHTML=(predicted_income*(values[0]/100)).toFixed(0)+' zł';
+                        document.getElementById('chemia').innerHTML=(predicted_income*((values[1]-values[0])/100)).toFixed(0)+' zł';
+                        document.getElementById('kosmetyki').innerHTML=(predicted_income*((values[2]-values[1])/100)).toFixed(0)+' zł';
+                        document.getElementById('dom').innerHTML=(predicted_income*((values[3]-values[2])/100)).toFixed(0)+' zł';
+                        document.getElementById('transport').innerHTML=(predicted_income*((values[4]-values[3])/100)).toFixed(0)+' zł';
+                        document.getElementById('inne').innerHTML=(predicted_income*((values[5]-values[4])/100)).toFixed(0)+' zł';
+                        document.getElementById('oszczednosci').innerHTML=(predicted_income*((100.0-values[5])/100)).toFixed(0)+' zł';
+                    });
+
+                    function salary_updated(){
+                        var predicted_income = document.getElementById('incomes').value;
+                        var slider_value = document.getElementById('slider-handles4');
+                        var values = slider_value.noUiSlider.get();
+
+                        document.getElementById('jedzenie').innerHTML=(predicted_income*(values[0]/100)).toFixed(0)+' zł';
+                        document.getElementById('chemia').innerHTML=(predicted_income*((values[1]-values[0])/100)).toFixed(0)+' zł';
+                        document.getElementById('kosmetyki').innerHTML=(predicted_income*((values[2]-values[1])/100)).toFixed(0)+' zł';
+                        document.getElementById('dom').innerHTML=(predicted_income*((values[3]-values[2])/100)).toFixed(0)+' zł';
+                        document.getElementById('transport').innerHTML=(predicted_income*((values[4]-values[3])/100)).toFixed(0)+' zł';
+                        document.getElementById('inne').innerHTML=(predicted_income*((values[5]-values[4])/100)).toFixed(0)+' zł';
+                        document.getElementById('oszczednosci').innerHTML=(predicted_income*((100.0-values[5])/100)).toFixed(0)+' zł';
+                    };
+
+                    function submit_slider(){
+                        var slider_value = document.getElementById('slider-handles4');
+                        var slider_value_handler = document.getElementById('slider_value_handler');
+                        slider_value_handler.value=slider_value.noUiSlider.get();
+
+                        //validate data
+
+                        if ((document.getElementById("month").value >= {{ current_month }}) &&
+                        (document.getElementById("year").value >= {{ current_year }}) &&
+                        (document.getElementById("incomes").value > 0))
+                        {
+
+                                document.getElementById("add_plan").submit();
+                                return false; // cancel the actual link
+
+                        } else {
+
+                            console.log("Złe dane!");
+
+                        }
+                    };
+
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<div class="fixed-action-btn">
+    <a href="#modal1"
+       class="btn-floating btn-large waves-effect waves-light red modal-trigger tooltipped"
+       data-position="left"
+       data-tooltip="Dodaj plan na nowy miesiąc">
+            <i class="material-icons">add</i>
+    </a>
+</div>
+<br><br>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        //var options = ['opacity'=0]
+        var instances = M.Modal.init(elems, {opacity: 0.6,
+                                            endingTop: '6%'});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems);
+    });
+</script>
+</script>
+{% endblock %}

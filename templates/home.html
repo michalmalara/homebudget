@@ -1,0 +1,178 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<!-- <nav>
+<div class="nav-wrapper">
+  <div class="col s12">
+    <a href="/" class="breadcrumb">Strona główna</a>
+    <a href="#" class="breadcrumb">Strona testowa</a>
+  </div>
+</div>
+</nav>-->
+{% endblock %}
+
+{% block title %}
+
+Twój domowy budżet
+
+{% endblock %}
+
+{% block header_title %}
+
+Twój domowy budżet
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+<div class="container">
+    <br><br>
+    <div class="carousel carousel-slider center">
+        <div class="carousel-item blue white-text" href="#one!">
+            <h1 class="header center orange-text">Twoje wydatki</h1>
+            <div class="row center">
+                <h5 class="header col s12 light">Zestawienie wydatków w tym miesiącu</h5>
+            </div>
+            <div class="row center">
+                <a href="/wydatki" id="download-button" class="btn-large waves-effect waves-light green">Przejdź</a>
+            </div>
+        </div>
+        <div class="carousel-item amber white-text" href="#two!">
+            <h1 class="header center orange-text">Twoje konta i zarobki</h1>
+            <div class="row center">
+                <h5 class="header col s12 light">Zestawienie zarobków w tym roku</h5>
+            </div>
+            <div class="row center">
+                <a href="/zarobki" id="download-button" class="btn-large waves-effect waves-light orange">Przejdź</a>
+            </div>
+        </div>
+        <div class="carousel-item red white-text" href="#three!">
+            <h1 class="header center orange-text">Twoje kredyty</h1>
+            <div class="row center">
+                <h5 class="header col s12 light">Zestawienie kredytów, które spłacasz.</h5>
+            </div>
+            <div class="row center">
+                <a href="/kredyty" id="download-button" class="btn-large waves-effect waves-light orange">Przejdź</a>
+            </div>
+        </div>
+        <div class="carousel-item green white-text" href="#four!">
+            <h1 class="header center orange-text">Twoje plany</h1>
+            <div class="row center">
+                <h5 class="header col s12 light">Zaplanuj wydatki, te duże i te małe!</h5>
+            </div>
+            <div class="row center">
+                <a href="/planowanie" id="download-button" class="btn-large waves-effect waves-light orange">Przejdź</a>
+            </div>
+        </div>
+        <div class="carousel-item amber white-text" href="#five!">
+            <h1 class="header center orange-text">Lista zakupów</h1>
+            <div class="row center">
+                <h5 class="header col s12 light">Rób listę zakupów - pozwoli Ci to zaoszczędzić więcej pieniędzy!</h5>
+            </div>
+            <div class="row center">
+                <a href="/lista_zakupow" id="download-button" class="btn-large waves-effect waves-light orange">Przejdź</a>
+            </div>
+        </div>
+  </div>
+
+</div>
+</div>
+
+<br><br>
+
+<div class="container">
+<div class="section">
+
+  <!--   Icon Section   -->
+  <div class="row">
+    <div class="col s12 m4">
+      <div class="icon-block">
+          <a herf="lista_zakupow"><h2 class="center light-blue-text"><i class="material-icons"><a href="lista_zakupow">list</a></i></h2></a>
+        <h5 class="center"><a href="/lista_zakupow">Lista zakupów</a></h5>
+
+        <p class="light">
+          <table class="responsive-table">
+            <thead>
+              <tr>
+                  <th>Nazwa</th>
+                  <th>Ilość</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for element in shopping_list %}
+              <tr>
+                <td>{{ element.name }}</td>
+                <td>{{ element.quantity }} {{ element.unit_name }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+
+      </div>
+    </div>
+
+    <div class="col s12 m4">
+      <div class="icon-block">
+        <a href="/zarobki"><h2 class="center light-blue-text"><i class="material-icons">attach_money</i></h2>
+        <h5 class="center">Stan kont</h5></a>
+            <table class="responsive-table">
+                <thead>
+                  <tr>
+                      <th>Konto</th>
+                      <th>Saldo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for account in accaunts %}
+                        <tr>
+                            <td>{{ account.accountName }}</td>
+                            <td>{{ account.amount|floatformat:2 }} {{ account.currency }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+      </div>
+    </div>
+
+    <div class="col s12 m4">
+      <div class="icon-block">
+          <a href="/kredyty"><h2 class="center light-blue-text"><i class="material-icons"><span class="red-text text-darken">credit_card</span></i></h2>
+          <h5 class="center"><span class="red-text text-darken">Kredyty</span></h5></a>
+          <span class="red-text text-darken">
+              <table class="responsive-table">
+                    <thead>
+                      <tr>
+                          <th>Nazwa</th>
+                          <th>Stan zadłużenia</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for credit in credits %}
+                            <tr>
+                                <td>{{credit.name}}</td>
+                                <td>{{credit.debt_left}} zł</td>
+                            </tr>
+                    {% endfor %}
+                    </tbody>
+              </table>
+          </span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<br><br>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    var elem = document.querySelectorAll('.carousel');
+    var instances = M.Carousel.init(elem, {fullWidth: true, indicators: true});
+  });
+</script>
+{% endblock %}

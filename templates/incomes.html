@@ -1,0 +1,227 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="#" class="breadcrumb">Zarobki</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Twoje zarobki
+
+{% endblock %}
+
+{% block header_title %}
+
+Twoje zarobki
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="index-banner">
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <form method="get" action="#" id="filter">
+                <div class="col s12 m4">
+                    <label for="id_year">Rok</label>
+                    <select name="year" class="input-field" id="id_year">
+                        <option>2020</option>
+                        <option>2019</option>
+                    </select>
+                </div>
+                <div class="col s12 m4">
+                    <label for="id_month">Miesiąc</label>
+                    <select name="month" class="input-field" id="id_month">
+                        <option {% if picked_month == 1 %} selected {% endif %}>1</option>
+                        <option {% if picked_month == 2 %} selected {% endif %}>2</option>
+                        <option {% if picked_month == 3 %} selected {% endif %}>3</option>
+                        <option {% if picked_month == 4 %} selected {% endif %}>4</option>
+                        <option {% if picked_month == 5 %} selected {% endif %}>5</option>
+                        <option {% if picked_month == 6 %} selected {% endif %}>6</option>
+                        <option {% if picked_month == 7 %} selected {% endif %}>7</option>
+                        <option {% if picked_month == 8 %} selected {% endif %}>8</option>
+                        <option {% if picked_month == 9 %} selected {% endif %}>9</option>
+                        <option {% if picked_month == 10 %} selected {% endif %}>10</option>
+                        <option {% if picked_month == 11 %} selected {% endif %}>11</option>
+                        <option {% if picked_month == 12 %} selected {% endif %}>12</option>
+                    </select>
+                </div>
+        </div>
+            <div class="row">
+            <div class="col s12 m4">
+                <button class="btn waves-effect waves-light" type="submit">
+                    Filtruj
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+            </form>
+        </div>
+
+        {%for account in accounts %}
+            <div class="card"><div class="card-content">
+                    <h2 class="header center orange-text">{{ account.account_name }}: {{ account.amount|floatformat:2 }} {{account.currency}}</h2>
+                    <table class="striped">
+                        <thead>
+                            <tr>
+                                <th>Nazwa wpływu</th>
+                                <th>Data</th>
+                                <th>Wpływ</th>
+                                <th>Usuń</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for income in account.incomes %}
+                            <tr>
+                                <td>{{income.name}}</td>
+                                <td>{{income.date}}</td>
+                                <td>{{income.income|floatformat:2}} {{account.currency}}</td>
+                                <td>
+                                <form method="POST" action="usun_wplyw">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ income.id }}">
+                                    <div id="delete_{{expense.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń wpływ: {{income.name}}, {{income.income|floatformat:2}} zł</p>
+                                            <p><button type="submit" class="btn waves-effect waves-light red">
+                                                Usuń<i class="material-icons">clear</i>
+                                        </button></p>
+                                        </div>
+                                    </div>
+                                    <a href="#delete_{{expense.id }}"
+                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                       data-position="right"
+                                       data-tooltip="Usuń wpływ">
+                                            <i class="material-icons">clear</i>
+                                    </a>
+                                </form>
+                        </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <br /><br />
+        {% endfor %}
+    </div>
+
+</div>
+
+<div id="modal1" class="modal">
+    <div class="modal-content">
+        <form method="post" action="/add_income_e">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="fixed-action-btn">
+
+</div>
+
+<div id="modal2" class="modal">
+    <div class="modal-content">
+        <form method="post" action="/dodaj_konto">
+            {% csrf_token %}
+            {{add_account_form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="modal3" class="modal">
+    <div class="modal-content">
+        <h4>Przelej pieniądze</h4>
+        <form method="post" action="/przelej_pieniadze">
+            {% csrf_token %}
+                {{transfer_form.as_p}}
+            <button class="btn waves-effect waves-light" type="submit" name="action">Przelej
+            <i class="material-icons right">send</i>
+            </button>
+        </form>
+    </div>
+</div>
+<!--<div class="fixed-action-btn">
+
+</div>-->
+
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large blue">
+    <i class="large material-icons">mode_edit</i>
+  </a>
+  <ul>
+    <li>
+        <a href="#modal1"
+               class="btn-floating btn waves-effect waves-light green modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Dodaj nowy wpływ">
+            <i class="material-icons">add</i>
+        </a>
+    </li>
+    <li>
+        <a href="#modal2"
+               class="btn-floating btn waves-effect waves-light amber modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Dodaj nowe konto">
+            <i class="material-icons">account_balance</i>
+        </a>
+    </li>
+    <li>
+        <a href="#modal3"
+               class="btn-floating btn waves-effect waves-light red modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Przelej pieniądze między kontami">
+            <i class="material-icons">compare_arrows</i>
+        </a>
+    </li>
+  </ul>
+</div>
+
+<br><br>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.modal');
+        //var options = ['opacity'=0]
+        var instances = M.Modal.init(elems, {opacity: 0.6,
+                                            endingTop: '6%'});
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.tooltipped');
+        var instances = M.Tooltip.init(elems);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.fixed-action-btn');
+        var instances = M.FloatingActionButton.init(elems);
+      });
+</script>
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'template.html' %}
+{% load static %}
+{% block breadcrumbs %}
+<!--Breadcrumbs-->
+<nav>
+    <div class="nav-wrapper">
+         <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <a href="/" class="breadcrumb">Strona główna</a>
+                <a href="wydatki?year={{current_year}}&month={{current_month}}" class="breadcrumb">Wydatki</a>
+                <a href="#" class="breadcrumb">Dodaj wydatek</a>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block title %}
+
+Dodaj wydatek
+
+{% endblock %}
+
+{% block header_title %}
+
+Dodaj wydatek
+
+{% endblock %}
+
+{% block content %}
+
+<div class="section no-pad-bot" id="add_expense">
+        <div class="row">
+            <div class="col s12 m6 l4 offset-m3 offset-l4">
+                <form method="post" action="/add_expense_e">
+                    {% csrf_token %}
+                    {{form.as_p}}
+                    <button class="btn waves-effect waves-light" type="submit" name="action">Dodaj
+                    <i class="material-icons right">send</i>
+                    </button>
+                </form>
+            </div>
+        </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+    });
+</script>
+{% endblock %}

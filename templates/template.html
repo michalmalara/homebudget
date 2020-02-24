@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>{% block title %}{% endblock %}</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href= "{% static 'css/materialize.css' %}" media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" media="screen,projection"/>
+  <link type="text/css" rel="stylesheet" href="{% static 'css/nouislider.min.css' %}" media="screen,projection"/>
+  <script type="text/javascript" src= "{% static 'js/nouislider.min.js' %}"></script>
+
+
+</head>
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <!-- TITLE -->
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">
+        {% block header_title %}
+        {% endblock %}
+      </a>
+
+      <!-- MENU -->
+      <ul class="right hide-on-med-and-down">
+      <li><a href="/"><i class="material-icons">home</i></a></li>
+      <li><a href="/lista_zakupow">Lista zakupów</a></li>
+      <li><a href="/wydatki">Wydatki</a></li>
+      <li><a href="/zarobki">Zarobki</a></li>
+      <li><a href="/planowanie">Plany</a></li>
+      {% if user.is_staff %}<li><a href="/admin/">Admin</a></li>{% endif %}
+      <li><a href="/wyloguj">Wyloguj się</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="sidenav">
+        <li><a href="/">Strona główna</a></li>
+        <li><a href="/lista_zakupow">Lista zakupów</a></li>
+        <li><a href="/wydatki">Wydatki</a></li>
+        <li><a href="/zarobki">Zarobki</a></li>
+        <li><a href="/planowanie">Plany</a></li>
+        {% if user.is_staff %}<li><a href="/admin">Admin</a></li>{% endif %}
+        <li><a href="/wyloguj">Wyloguj się</a></li>
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+
+  {% block breadcrumbs %}
+  {% endblock %}
+
+  <!-- PAGE CONTENT -->
+
+  <div class="card-content">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src= "{% static 'js/materialize.min.js' %}"></script>
+  <script type="text/javascript" src= "{% static 'js/init.js' %}"></script>
+
+  {% block javascript %}
+  {% endblock %}
+  </body>
+</html>

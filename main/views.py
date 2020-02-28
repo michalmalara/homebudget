@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Expenses, Accounts, Incomes, Credits, ShoppingList, Plan
-from .forms import ExpensesForm, IncomesForm, AccountsForm, TransferMoneyForm, NewCreditForm, NewShoppingListForm
+from .models import Expenses, Accounts, Incomes, Credits, ShoppingList, Plan, UnregularPlan
+from .forms import ExpensesForm, IncomesForm, AccountsForm, TransferMoneyForm, NewCreditForm, NewShoppingListForm, NewUnregularPlan
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -63,6 +63,19 @@ def expenses_view(request):
     except ObjectDoesNotExist:
         plan = None
 
+    uplans = UnregularPlan.objects.all().filter(date__year=picked_year, date__month=picked_month)
+
+    uplans_sum = {
+        'Jedzenie': 0.0,
+        'Chemia': 0.0,
+        'Kosmetyki_Higiena_Leki': 0.0,
+        'Dom': 0.0,
+        'Transport': 0.0,
+        'Inne': 0.0
+    }
+
+    for uplan in uplans:
+        uplans_sum[uplan.category] += uplan.value
 
     expenses_sum = {
         'Jedzenie': 0.0,
@@ -79,12 +92,12 @@ def expenses_view(request):
     if plan:
         plan_present = True
         plan_evaluation = {
-            'Jedzenie': (plan.jedzenie/100.0) * plan.predicted_income,
-            'Chemia': (plan.chemia/100.0) * plan.predicted_income,
-            'Kosmetyki_Higiena_Leki': (plan.kosmetyki/100.0) * plan.predicted_income,
-            'Dom': (plan.dom/100.0) * plan.predicted_income,
-            'Transport': (plan.transport/100.0) * plan.predicted_income,
-            'Inne': (plan.inne/100.0) * plan.predicted_income
+            'Jedzenie': uplans_sum['Jedzenie'] + (plan.jedzenie/100.0) * plan.predicted_income,
+            'Chemia': uplans_sum['Chemia'] + (plan.chemia/100.0) * plan.predicted_income,
+            'Kosmetyki_Higiena_Leki': uplans_sum['Kosmetyki_Higiena_Leki'] + (plan.kosmetyki/100.0) * plan.predicted_income,
+            'Dom': uplans_sum['Dom'] + (plan.dom/100.0) * plan.predicted_income,
+            'Transport': uplans_sum['Transport'] + (plan.transport/100.0) * plan.predicted_income,
+            'Inne': uplans_sum['Inne'] + (plan.inne/100.0) * plan.predicted_income
         }
         used_plan = {
             'Jedzenie': expenses_sum['Jedzenie']/plan_evaluation['Jedzenie']*100,
@@ -96,7 +109,14 @@ def expenses_view(request):
         }
     else:
         plan_present = False
-        plan_evaluation = None
+        plan_evaluation = {
+            'Jedzenie': uplans_sum['Jedzenie'],
+            'Chemia': uplans_sum['Chemia'],
+            'Kosmetyki_Higiena_Leki': uplans_sum['Kosmetyki_Higiena_Leki'],
+            'Dom': uplans_sum['Dom'],
+            'Transport': uplans_sum['Transport'],
+            'Inne': uplans_sum['Inne']
+        }
         used_plan = None
 
     data = {
@@ -376,7 +396,9 @@ def delete_shopping_list(request):
 @login_required(login_url=login_url)
 def planning(request, **kwargs):
     plans = Plan.objects.all().order_by('-date')
+    unregularPlan = UnregularPlan.objects.all().filter(realized=False).order_by('-date')
     plans_list = []
+
     for p in plans:
         d = {'plan': p,
             'jedzenie': p.jedzenie/100 * p.predicted_income,
@@ -391,7 +413,9 @@ def planning(request, **kwargs):
     data = {
         'current_year': dt.now().year,
         'current_month': dt.now().month,
-        'plans': plans_list
+        'plans': plans_list,
+        'unregular_plans': unregularPlan,
+        'unregular_plan_form': NewUnregularPlan()
     }
 
     if 'info' in kwargs:
@@ -438,3 +462,45 @@ def delete_plan(request):
         plan = Plan.objects.get(id=request.POST['id'])
         plan.delete()
     return redirect('/planowanie')
+
+
+@login_required(login_url=login_url)
+def add_uplan(request):
+    if request.method == 'POST':
+        form = NewUnregularPlan(request.POST)
+        if form.is_valid():
+            clean_data = form.cleaned_data
+            print(clean_data)
+            uplan = UnregularPlan()
+            uplan.name = clean_data['name']
+            uplan.date = clean_data['date']
+            uplan.category = clean_data['category']
+            uplan.value = clean_data['value']
+            uplan.charged_account = clean_data['charged_account']
+            uplan.realized = False
+            uplan.add()
+    return planning(request)
+
+
+@login_required(login_url=login_url)
+def delete_uplan(request):
+    if request.method == 'POST':
+        plan = UnregularPlan.objects.get(id=request.POST['id'])
+        plan.delete()
+    return redirect('/planowanie')
+
+
+@login_required(login_url=login_url)
+def realize_plan(request):
+    plan = UnregularPlan.objects.get(id=request.POST['id'])
+
+    expense = Expenses()
+    expense.name = plan.name
+    expense.category = plan.category
+    expense.quantity = 1.0
+    expense.unit_price = expense.total_price = plan.value
+    expense.add_expense()
+
+    plan.realized = True
+    plan.save()
+    return planning(request, info=f'Dodano "{expense.name}" do listy wydatków.')

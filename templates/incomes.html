@@ -87,25 +87,25 @@ Twoje zarobki
                                 <td>{{income.date}}</td>
                                 <td>{{income.income|floatformat:2}} {{account.currency}}</td>
                                 <td>
-                                <form method="POST" action="usun_wplyw">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="id" value="{{ income.id }}">
-                                    <div id="delete_{{expense.id }}" class="modal">
-                                        <div class="modal-content center">
-                                            <p>Usuń wpływ: {{income.name}}, {{income.income|floatformat:2}} zł</p>
-                                            <p><button type="submit" class="btn waves-effect waves-light red">
-                                                Usuń<i class="material-icons">clear</i>
-                                        </button></p>
+                                    <form method="POST" action="usun_wplyw">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{ income.id }}">
+                                        <div id="delete_{{expense.id }}" class="modal">
+                                            <div class="modal-content center">
+                                                <p>Usuń wpływ: {{income.name}}, {{income.income|floatformat:2}} zł</p>
+                                                <p><button type="submit" class="btn waves-effect waves-light red">
+                                                    Usuń<i class="material-icons">clear</i>
+                                            </button></p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <a href="#delete_{{expense.id }}"
-                                       class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
-                                       data-position="right"
-                                       data-tooltip="Usuń wpływ">
-                                            <i class="material-icons">clear</i>
-                                    </a>
-                                </form>
-                        </td>
+                                        <a href="#delete_{{expense.id }}"
+                                           class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                           data-position="right"
+                                           data-tooltip="Usuń wpływ">
+                                                <i class="material-icons">clear</i>
+                                        </a>
+                                    </form>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

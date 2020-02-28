@@ -92,6 +92,65 @@ Twoje plany
                 </div>
             </div>
 
+        <div class="card">
+            <div class="card-content">
+                <h2 class="header center orange-text">Dodatkowe wydatki:</h2>
+                <table class="striped centered responsive-table">
+                    <thead>
+                        <th>Data wydatku</th>
+                        <th>Nazwa</th>
+                        <th>Kategoria</th>
+                        <th>Koszt</th>
+                        <th>Zrealizuj plan</th>
+                        <th><!--Usuń plan--></th>
+                    </thead>
+                    <tbody>
+                        {% for uplan in unregular_plans %}
+                        <tr>
+                            <td>{{ uplan.date }}</td>
+                            <td>{{ uplan.name }}</td>
+                            <td>{{ uplan.category }}</td>
+                            <td>{{ uplan.value|floatformat:2 }} zł</td>
+                            <td>
+                                <form method="POST" action="zrealizuj_plan">
+                                {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ uplan.id }}">
+                                    <button type="submit" class="btn-floating btn waves-effect waves-light green modal-trigger">
+                                        <i class="material-icons">check</i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="POST" action="usun_uplan">
+                                {% csrf_token %}
+                                    <input type="hidden" name="id" value="{{ uplan.id }}">
+                                    <div id="delete_u_{{ uplan.id }}" class="modal">
+                                        <div class="modal-content center">
+                                            <p>Usuń dodatkowy wydatek: {{uplan.name }}, {{ uplan.value|floatformat:2 }} zł</p>
+                                            <p>
+                                                <button type="submit" class="waves-effect waves-light red btn-large">
+                                                    Usuń
+                                                </button>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </form>
+                                <a href="#delete_u_{{uplan.id }}"
+                                   class="btn-floating waves-effect waves-light red modal-trigger tooltipped"
+                                   data-position="right"
+                                   data-tooltip="Usuń wydatek">
+                                        <i class="material-icons">clear</i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
         <div class="modal" id="modal1">
             <div class="modal-content">
                 <form action="/dodaj_plan" method="POST" id="add_plan">{% csrf_token %}
@@ -240,17 +299,42 @@ Twoje plany
                 </script>
             </div>
         </div>
+
+        <div class="modal" id="modal2">
+            <div class="modal-content">
+                <form method="POST", action="dodaj_nieregularny_wydatek">
+                    {% csrf_token %}
+                    {{unregular_plan_form.as_p}}
+                    <button type="submit" class="btn waves-effect waves-light" name="action">Dodaj
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 </div>
 </div>
 <div class="fixed-action-btn">
-    <a href="#modal1"
-       class="btn-floating btn-large waves-effect waves-light red modal-trigger tooltipped"
-       data-position="left"
-       data-tooltip="Dodaj plan na nowy miesiąc">
+  <a class="btn-floating btn-large blue">
+    <i class="large material-icons">mode_edit</i>
+  </a>
+  <ul>
+    <li>
+        <a href="#modal1"
+               class="btn-floating btn waves-effect waves-light green modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Dodaj nowy plan">
             <i class="material-icons">add</i>
-    </a>
+        </a>
+    </li>
+    <li>
+        <a href="#modal2"
+               class="btn-floating btn waves-effect waves-light amber modal-trigger tooltipped"
+               data-position="left"
+               data-tooltip="Dodaj wydatek nieregularny">
+            <i class="material-icons">assignment</i>
+        </a>
+    </li>
+  </ul>
 </div>
 <br><br>
 
@@ -278,6 +362,21 @@ Twoje plany
     document.addEventListener('DOMContentLoaded', function() {
         var elems = document.querySelectorAll('.fixed-action-btn');
         var instances = M.FloatingActionButton.init(elems);
+    });
+
+    var now = new Date()
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.datepicker');
+        var instances = M.Datepicker.init(elems, {format: 'dd.mm.yyyy',
+                                                  minDate: now,
+                                                  i18n: {cancel: 'Wstecz',
+                                                         months: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+                                                         monthsShort: ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'],
+                                                         weekdays: ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'],
+                                                         weekdaysShort: ['Pon', 'Wt', 'Śr', 'Czw', 'Pią', 'Sob', 'Niedz'],
+                                                         weekdaysAbbrev: ['P','W','S','C','P','S','N']}
+                                                  });
     });
 </script>
 </script>

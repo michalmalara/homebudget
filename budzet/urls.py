@@ -43,6 +43,9 @@ urlpatterns = [
     path('usun_element', views.delete_shopping_list),
     path('planowanie', views.planning, name='planning'),
     path('dodaj_plan', views.add_plan),
-    path('usun_plan', views.delete_plan)
+    path('usun_plan', views.delete_plan),
+    path('dodaj_nieregularny_wydatek', views.add_uplan),
+    path('usun_uplan', views.delete_uplan),
+    path('zrealizuj_plan', views.realize_plan),
 ]
 urlpatterns += staticfiles_urlpatterns()

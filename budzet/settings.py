@@ -14,7 +14,7 @@ import os
 import django_heroku
 
 # Activate Heroku
-django_heroku.settings(locals())
+# django_heroku.settings(locals())
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,13 +27,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'u!fal5rwo@!49w(h_tiwci0+22#4v_#vvwonvih7fa@7aig*+q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['localhost']
-
-# DEBUG = True
+# DEBUG = False
 #
-# ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['localhost']
+
+DEBUG = True
+
+ALLOWED_HOSTS = []
 
 
 
@@ -83,22 +83,22 @@ WSGI_APPLICATION = 'budzet.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'appkabudzetowa',
-        'HOST': 'mysql.cba.pl',
-        'USER': 'appkabudzetowa',
-        'PASSWORD': 'Kosmogon2@',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'appkabudzetowa',
+#         'HOST': 'mysql.cba.pl',
+#         'USER': 'appkabudzetowa',
+#         'PASSWORD': 'Kosmogon2@',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

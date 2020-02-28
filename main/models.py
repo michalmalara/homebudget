@@ -149,6 +149,32 @@ class Plan(models.Model):
         return f'Plan: {self.date.month}.{self.date.year}'
 
 
+class UnregularPlan(models.Model):
+    date = models.DateField()
+    name = models.CharField(max_length=20)
+    value = models.FloatField()
+    category = models.CharField(
+        max_length=50,
+        choices=(
+            ('Jedzenie', 'Jedzenie'),
+            ('Chemia', 'Chemia'),
+            ('Kosmetyki_Higiena_Leki', 'Kosmetyki, środki higieniczne i lekarstwa'),
+            ('Dom', 'Dom'),
+            ('Transport', 'Transport'),
+            ('Inne', 'Inne')
+        ),
+        default='Inne'
+    )
+    charged_account = models.ForeignKey(Accounts, on_delete=models.CASCADE, default=1)
+    realized = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.name} ({self.date}): {self.value} zł'
+
+    def add(self):
+        self.save()
+
+
 # Signals handling
 
 

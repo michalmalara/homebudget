@@ -1,5 +1,5 @@
 from django import forms
-from .models import Expenses, Incomes, Accounts, Credits, ShoppingList
+from .models import Expenses, Incomes, Accounts, Credits, ShoppingList, UnregularPlan
 
 
 class ExpensesForm(forms.ModelForm):
@@ -90,11 +90,23 @@ class NewShoppingListForm(forms.ModelForm):
                   'unit_name': 'Jednostka'}
 
 
+class NewUnregularPlan(forms.ModelForm):
+    class Meta:
+        model = UnregularPlan
+        fields = ('name', 'date', 'category', 'value', 'charged_account')
+        labels = {'name': 'Nazwa',
+                  'date': 'Przewidywana data zakupu',
+                  'category': 'Kategoria',
+                  'value': 'Przewidywany koszt',
+                  'charged_account': 'Konto'}
+
+        widgets = {
+            'date': forms.TextInput(attrs={'class': 'datepicker'})
+        }
+
+
 class TransferMoneyForm(forms.Form):
     accounts = Accounts.objects.all()
     source_account = forms.ModelChoiceField(accounts, label='Z konta...', initial=accounts[0])
     target_account = forms.ModelChoiceField(accounts, label='Na konto...', initial=accounts[1])
     amount = forms.FloatField(label='Kwota(zł)')
-
-
-

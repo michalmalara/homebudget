@@ -41,21 +41,49 @@ Lista zakupów
                             <p>Udzielony kredyt: {{credit.total_debt }} zł</p>
                             <p>Pozostało do spłaty: {{ credit.debt_left|floatformat:2 }} zł</p>
                             <p>Wysokość raty: {{ credit.repayment|floatformat:2 }} zł</p>
-                            <p>Oprocentowanie: {{ credit.interests }}%</p>
+                                <div id="edit_percentes_{{credit.id}}_modal" class="modal">
+                                    <div class="modal-content">
+                                        <form action="/edytuj_oprocentowanie" method="POST">{% csrf_token %}<input type="hidden" name="id" value="{{credit.id}}">
+                                            {{ edit_percentes_form }}
+                                            <button class="btn waves-effect waves-light" type="submit" name="action">Edytuj
+                                                <i class="material-icons right">send</i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <p>Oprocentowanie: {{ credit.interests }}% <a href="#edit_percentes_{{credit.id}}_modal" class="modal-trigger">Edytuj</a></p>
                             <p>Obciążane konto: {{credit.account}}</p>
                         </div>
                     </div>
                     <div class="card-action">
-                            <form action="/splata_raty" method="POST" id="splata_form_{{credit.id}}">{% csrf_token %}<input type="hidden" name="id" value="{{credit.id}}"> </form>
-                            <a class="waves-effect waves-light btn-flat" id="splata_{{credit.id}}"><i class="tiny material-icons prefix">account_balance_wallet</i> Spłata raty</a>
-                            <script type="text/javascript">
-                                document.getElementById("splata_{{credit.id}}").onclick=function() {
-                                     document.getElementById("splata_form_{{credit.id}}").submit();
-                                     return false; // cancel the actual link
-                                }
-                            </script>
-                            <a href="#edytuj_modal" class="waves-effect waves-light btn-flat"><i class="tiny material-icons">edit</i> Edytuj</a>
-                            <a href="#czesiowa_splata_modal" class="waves-effect waves-light btn-flat"><i class="tiny material-icons">credit_card</i> Częścoiwa spłata raty</a>
+                        <div id="splata_raty_{{credit.id}}_modal" class="modal">
+                            <div class="modal-content">
+                                <form action="/splata_raty" method="POST">{% csrf_token %}<input type="hidden" name="id" value="{{credit.id}}">
+                                    {{pay_credit_form.as_p}}
+                                    <button class="btn waves-effect waves-light" type="submit" name="action">Spłać
+                                        <i class="material-icons right">send</i>
+                                </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="usun_kredyt">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ credit.id }}">
+                            <div id="usun_{{credit.id}}_modal" class="modal">
+                                <div class="modal-content center">
+                                    <p>Usuń kredyt: {{credit.name}}.</p><br>
+                                    <p>
+                                        <button type="submit" class="waves-effect waves-light red btn-large">
+                                            Usuń
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+
+                        <a href="#splata_raty_{{credit.id}}_modal" class="waves-effect waves-light modal-trigger btn-flat"><i class="tiny material-icons prefix">account_balance_wallet</i> Spłata raty</a>
+                        <a href="#usun_{{credit.id}}_modal" class="waves-effect waves-light modal-trigger btn-flat"><i class="tiny material-icons">clear</i> Usuń</a>
                     </div>
                 </div>
             </div>

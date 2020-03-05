@@ -37,6 +37,8 @@ urlpatterns = [
     path('kredyty', views.credits_view),
     path('dodaj_kredyt', views.add_credit_e),
     path('splata_raty', views.pay_credit),
+    path('usun_kredyt', views.delete_credit),
+    path('edytuj_oprocentowanie', views.edit_percentes),
     path('lista_zakupow', views.shopping_list_view),
     path('zrob_zakupy', views.finalize_shopping_list),
     path('dodaj_zakup', views.add_to_shopping_list),

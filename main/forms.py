@@ -110,3 +110,12 @@ class TransferMoneyForm(forms.Form):
     source_account = forms.ModelChoiceField(accounts, label='Z konta...', initial=accounts[0])
     target_account = forms.ModelChoiceField(accounts, label='Na konto...', initial=accounts[1])
     amount = forms.FloatField(label='Kwota(zł)')
+
+
+class PayCreditForm(forms.Form):
+    capital_installment = forms.FloatField(min_value=0.0, required=False, label='Rata kapitałowa')
+    interest_installment = forms.FloatField(min_value=0.0, required=False, label='Rata odsetkowa')
+
+
+class EditPercentesForm(forms.Form):
+    percentes = forms.FloatField(min_value=0.0, label='Nowe oprocentowanie')

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Expenses, Accounts, Incomes, Credits, ShoppingList, Plan, UnregularPlan
-from .forms import ExpensesForm, IncomesForm, AccountsForm, TransferMoneyForm, NewCreditForm, NewShoppingListForm, NewUnregularPlan
+from .forms import ExpensesForm, IncomesForm, AccountsForm, TransferMoneyForm, NewCreditForm, NewShoppingListForm, NewUnregularPlan, PayCreditForm,EditPercentesForm
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -284,6 +284,8 @@ def credits_view(request):
     data = {
         'credits': credits.filter(debt_left__gt=0),
         'new_credit_form': NewCreditForm(),
+        'pay_credit_form': PayCreditForm(),
+        'edit_percentes_form': EditPercentesForm(),
     }
     return render(request, 'credits.html', data)
 
@@ -311,7 +313,10 @@ def add_credit_e(request):
 @login_required(login_url=login_url)
 def pay_credit(request):
     if request.method == 'POST':
-        if 'id' in request.POST:
+        form = PayCreditForm(request.POST)
+        if form.is_valid():
+            clean_data = form.cleaned_data
+            repayment = clean_data['capital_installment'] + clean_data['interest_installment']
             credit_id = int(request.POST['id'])
             credit = Credits.objects.get(id=credit_id)
             account = Accounts.objects.get(id=credit.account.id)
@@ -322,20 +327,35 @@ def pay_credit(request):
             expense.quantity = 1
             expense.unit_name = 'szt'
             expense.currency = 'zł'
-            expense.unit_price = credit.repayment
-            expense.total_price = credit.repayment
+            expense.unit_price = repayment
+            expense.total_price = repayment
             expense.charged_account = account
             expense.save()
 
-            account.amount -= credit.repayment
+            account.amount -= repayment
             account.save()
-            credit.debt_left -= credit.repayment
+            credit.debt_left -= clean_data['capital_installment']
             if credit.debt_left <= 0:
                 credit.debt_left = 0
             credit.save()
 
     return redirect('/kredyty')
 
+def delete_credit(request):
+    if request.method == 'POST':
+        credit = Credits.objects.get(id=request.POST['id'])
+        credit.delete()
+    return redirect('/kredyty')
+
+def edit_percentes(request):
+    if request.method == 'POST':
+        form = EditPercentesForm(request.POST)
+        if form.is_valid():
+            clean_data = form.cleaned_data
+            credit = Credits.objects.get(id=request.POST['id'])
+            credit.interests = clean_data['percentes']
+            credit.save()
+    return redirect('/kredyty')
 
 @login_required(login_url=login_url)
 def shopping_list_view(request):

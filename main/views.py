@@ -10,7 +10,6 @@ import datetime
 
 login_url = '/zaloguj'
 
-
 # Create your views here.
 
 def login_view(request):
@@ -306,6 +305,7 @@ def add_credit_e(request):
             credit.installments_payed = clean_data['installments_payed']
             credit.interests = clean_data['installments_payed']
             credit.account = clean_data['account']
+            credit.category = clean_data['category']
             credit.add_credit()
     return redirect('/kredyty')
 
@@ -323,7 +323,7 @@ def pay_credit(request):
 
             expense = Expenses()
             expense.name = f'Spłata kredytu: {credit.name}'
-            expense.category = 'Inne'
+            expense.category = credit.category
             expense.quantity = 1
             expense.unit_name = 'szt'
             expense.currency = 'zł'

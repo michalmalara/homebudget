@@ -150,10 +150,12 @@ Twój domowy budżet
                     </thead>
                     <tbody>
                         {% for credit in credits %}
+                            {% if credit.debt_left > 0 %}
                             <tr>
-                                <td>{{credit.name}}</td>
-                                <td>{{credit.debt_left}} zł</td>
+                                <td>{{ credit.name }}</td>
+                                <td>{{ credit.debt_left }} zł</td>
                             </tr>
+                        {% endif %}
                     {% endfor %}
                     </tbody>
               </table>

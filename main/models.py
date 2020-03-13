@@ -88,6 +88,18 @@ class Credits(models.Model):
     interests = models.FloatField()
     date = models.DateField(default=timezone.now)
     account = models.ForeignKey(Accounts, on_delete=models.CASCADE, default=1)
+    category = models.CharField(
+        max_length=50,
+        choices=(
+            ('Jedzenie', 'Jedzenie'),
+            ('Chemia', 'Chemia'),
+            ('Kosmetyki_Higiena_Leki', 'Kosmetyki, środki higieniczne i lekarstwa'),
+            ('Dom', 'Dom'),
+            ('Transport', 'Transport'),
+            ('Inne', 'Inne')
+        ),
+        default='Inne'
+    )
 
     def add_credit(self):
         self.date = timezone.now()

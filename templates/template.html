@@ -26,13 +26,14 @@
 
       <!-- MENU -->
       <ul class="right hide-on-med-and-down">
-      <li><a href="/"><i class="material-icons">home</i></a></li>
-      <li><a href="/lista_zakupow">Lista zakupów</a></li>
-      <li><a href="/wydatki">Wydatki</a></li>
-      <li><a href="/zarobki">Zarobki</a></li>
-      <li><a href="/planowanie">Plany</a></li>
-      {% if user.is_staff %}<li><a href="/admin/">Admin</a></li>{% endif %}
-      <li><a href="/wyloguj">Wyloguj się</a></li>
+        <li><a href="/"><i class="material-icons">home</i></a></li>
+        <li><a href="/lista_zakupow">Lista zakupów</a></li>
+        <li><a href="/wydatki">Wydatki</a></li>
+        <li><a href="/zarobki">Zarobki</a></li>
+        <li><a href="/planowanie">Plany</a></li>
+        <li><a href="/kredyty">Kredydy</a></li>
+        {% if user.is_staff %}<li><a href="/admin/">Admin</a></li>{% endif %}
+        <li><a href="/wyloguj">Wyloguj się</a></li>
       </ul>
 
       <ul id="nav-mobile" class="sidenav">
@@ -41,6 +42,7 @@
         <li><a href="/wydatki">Wydatki</a></li>
         <li><a href="/zarobki">Zarobki</a></li>
         <li><a href="/planowanie">Plany</a></li>
+        <li><a href="/kredyty">Kredydy</a></li>
         {% if user.is_staff %}<li><a href="/admin">Admin</a></li>{% endif %}
         <li><a href="/wyloguj">Wyloguj się</a></li>
       </ul>
@@ -60,7 +62,7 @@
 
 
   <!-- Scripts -->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
   <script type="text/javascript" src= "{% static 'js/materialize.min.js' %}"></script>
   <script type="text/javascript" src= "{% static 'js/init.js' %}"></script>
 

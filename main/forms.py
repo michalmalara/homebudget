@@ -31,6 +31,7 @@ class ExpensesForm(forms.ModelForm):
             'unit_name': forms.Select(attrs={'class': 'input-field'}),
         }
 
+
 class IncomesForm(forms.ModelForm):
     class Meta:
         model = Incomes
@@ -66,7 +67,7 @@ class AccountsForm(forms.ModelForm):
 class NewCreditForm(forms.ModelForm):
     class Meta:
         model = Credits
-        fields = ('name', 'total_debt', 'debt_left', 'repayment', 'number_of_installments', 'installments_payed', 'interests', 'account')
+        fields = ('name', 'total_debt', 'debt_left', 'repayment', 'number_of_installments', 'installments_payed', 'interests', 'account', 'category')
         labels = {
             'name': 'Nazwa kredytu',
             'total_debt': 'Udzielony kredyt (zł)',
@@ -75,7 +76,8 @@ class NewCreditForm(forms.ModelForm):
             'number_of_installments': 'Liczba rat',
             'installments_payed': 'Liczba wpłaconych rat',
             'interests': 'Oprocentowanie (%)',
-            'account': 'Obciążane konto'
+            'account': 'Obciążane konto',
+            'category': 'Kategoria',
         }
 
 
